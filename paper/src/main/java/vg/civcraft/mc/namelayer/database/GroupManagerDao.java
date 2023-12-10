@@ -35,7 +35,16 @@ public class GroupManagerDao {
 	private Logger logger;
 	private ManagedDatasource db;
 	protected NameLayerPlugin plugin = NameLayerPlugin.getInstance();
-	
+
+
+	private static final String playerGroupNumTrackerRETRIVE = "SELECT `amount` FROM `playertracker` WHERE uuid = ?";
+	private static final String playerGroupNumTrackerREMOVE = "UPDATE `playertracker` SET amount=amount-1 WHERE uuid = ?;";
+	private static final String playerGroupNumTrackerADD = "INSERT INTO `playertracker` (uuid,amount) values(?, 1) ON DUPLICATE KEY UPDATE amount = amount+1";
+
+	private static final String getAllGroupLeaves = "SELECT `timestamp` FROM `sizelimitlog` WHERE `groupname` = ?";
+
+	private static final String appendleavetimestamp = "insert into sizelimitlog(username, groupname, timestamp) values(?, ?, ?)";
+
 	private static final String removeCycles = "delete a from subgroup a join faction_id a2 ON a.group_id = a2.group_id "
 				+ "JOIN subgroup b JOIN faction_id b2 on b.sub_group_id = b2.group_id where a2.group_name = b2.group_name;";
 	private static final String createGroup = "call createGroup(?,?,?,?)";
@@ -493,6 +502,22 @@ public class GroupManagerDao {
 				"DELETE FROM permissionByGroup "
 						+ "WHERE role='" + PlayerType.NOT_BLACKLISTED +"' "
 						+ "AND perm_id=(SELECT perm_id FROM permissionIdMapping WHERE name='BASTION_PLACE');");
+
+		//group size limit table
+		db.registerMigration(15,false,
+				"CREATE TABLE IF NOT EXISTS sizelimitlog (" +
+						"    username VARCHAR(16)," +
+						"    groupname VARCHAR(255)," +
+						"    timestamp TIMESTAMP," +
+						" PRIMARY KEY (username, groupname, timestamp)" +
+						");");
+
+		db.registerMigration(16, false,
+				"CREATE TABLE IF NOT EXISTS playertracker (" +
+						" uuid varchar(36)," +
+						" amount SMALLINT," +
+						" PRIMARY KEY (uuid) );"
+				);
 	}
 	
 	public int createGroup(String group, UUID owner, String password){
@@ -1392,7 +1417,91 @@ public class GroupManagerDao {
 					+ uuid + " with role " + role, e);
 		}
 	}
-	
+
+	//citylion
+	public void noteGroupleave(String username, String groupName){
+		try (Connection connection = db.getConnection();
+			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.appendleavetimestamp);){
+			noteRemoval.setString(1, username);
+			noteRemoval.setString(2, groupName);
+			noteRemoval.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
+			noteRemoval.executeUpdate();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem noting removal " + groupName + "  for "
+					+ username, e);
+		}
+	}
+
+	public int getNumLockedSlots(String groupName) {
+		int lockedslots = 0;
+
+		try (Connection connection = db.getConnection();
+			 PreparedStatement getLockedSlots = connection.prepareStatement(GroupManagerDao.getAllGroupLeaves)) {
+
+			getLockedSlots.setString(1, groupName);
+
+			try (ResultSet set = getLockedSlots.executeQuery()) {
+				while (set.next()) {
+					Timestamp timestamp = set.getTimestamp(1);
+					if (timestamp != null) {
+						long timediff = System.currentTimeMillis() - timestamp.getTime();
+						if (timediff < 86400000 && timediff > 0) {
+							lockedslots++;
+						}
+					}
+				}
+			}
+
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting num locked slots", e);
+		}
+		//logger.log(Level.FINE, "Locked slots num is " + lockedslots + " for " + groupName);
+		return lockedslots;
+	}
+
+	//citylion
+	public void trackjoin(final UUID uuid){
+		try (Connection connection = db.getConnection();
+			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerADD);){
+			noteRemoval.setString(1, String.valueOf(uuid));
+			noteRemoval.executeUpdate();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem tracking join " + uuid, e);
+		}
+	}
+
+	public void trackleave(final UUID uuid){
+		try (Connection connection = db.getConnection();
+			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerREMOVE);){
+			noteRemoval.setString(1, String.valueOf(uuid));
+			noteRemoval.executeUpdate();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem tracking leave " + uuid, e);
+		}
+	}
+
+	public int getUsersGroupsNum(final UUID uuid) {
+		int groupsin = 0;
+
+		try (Connection connection = db.getConnection();
+			 PreparedStatement retriveGroupNum = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerRETRIVE)) {
+
+			retriveGroupNum.setString(1, String.valueOf(uuid)); // Assuming the UUID is stored as a string
+
+			try (ResultSet set = retriveGroupNum.executeQuery()) {
+				if (set.next()) {
+					groupsin = set.getInt(1);
+				}
+			}
+
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting user's number of groups", e);
+		}
+
+		return groupsin;
+	}
+
+
 	public void removeGroupInvitationAsync(final UUID uuid, final String groupName){
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
 

@@ -4,14 +4,16 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
+import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.command.BaseCommandMiddle;
 import vg.civcraft.mc.namelayer.group.Group;
 import vg.civcraft.mc.namelayer.permission.PermissionType;
@@ -41,17 +43,24 @@ public class DeleteGroup extends BaseCommandMiddle {
 					p.sendMessage(ChatColor.RED + "You do not have permission to run that command.");
 					return;
 				}
+
 				Date now = new Date(System.currentTimeMillis() - 15000);
 				//if it has been less than 15 seconds
 				if(now.getTime() < Long.parseLong(entry[1]))
 				{
+
+					//Bukkit.getLogger().severe("[NAMELAYER] PARSING ALL MEMBERS FOR DELETION");
+					List<UUID> members = gD.getAllMembers();
+					for (UUID uid : members) {
+						NameLayerPlugin.getGroupManagerDao().trackleave(uid);
+					}
+
 					//good to go delete the group
 					if(gm.deleteGroup(gD.getName()))
 						p.sendMessage(ChatColor.GREEN + "Group was successfully deleted.");
 					else
 						p.sendMessage(ChatColor.GREEN + "Group is now disciplined."
 								+ " Check back later to see if group is deleted.");
-					
 					confirmDeleteGroup.remove(uuid);
 					return;
 				}
@@ -61,8 +70,7 @@ public class DeleteGroup extends BaseCommandMiddle {
 					return;
 				}
 			}
-			
-			
+
 		}
 		Group g = gm.getGroup(x);
 		if (groupIsNull(sender, x, g)) {

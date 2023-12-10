@@ -62,6 +62,32 @@ public class InvitationGUI extends AbstractGroupGUI{
 				
 				@Override
 				public void clicked(Player arg0) {
+
+					int locked = g.getLockedSlots();
+					int remainingslots = Group.groupsizelimit - g.getAllMembers().size() - locked;
+					int usedslots = g.getAllMembers().size();
+					boolean anylocked = false; if(locked > 0){ anylocked = true;}
+
+					if(remainingslots < 1){
+						if(anylocked){
+							if(locked>1){
+								p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken! " + locked +" slots are locked because a player recently left " +
+										"your group, they will be unlocked soon.");
+							}
+							else{
+								p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken! " + locked +" slot is locked because a player recently left " +
+										"your group, it will be unlocked soon.");
+							}
+
+						}
+						else{
+							p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken!");
+						}
+
+						if(remainingslots <0){ Bukkit.getLogger().severe("[NAMELAYER] Severe - group has overused slots, groupname: " + g.getName());}
+						return;
+					}
+
 					p.sendMessage(ChatColor.GOLD + "Enter the name of the player to invite or \"cancel\" to exit this prompt. You may also enter the names "
 							+ "of multiple players, separated with spaces to invite all of them.");
 					selectedType = pType;

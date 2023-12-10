@@ -52,10 +52,11 @@ public class BlackList {
 	}
 	
 	public void addBlacklistMember(Group group, UUID uuid, boolean writeToDb) {
-		addBlacklistMember(group.getName(), uuid, writeToDb);
+		//addBlacklistMember(group.getName(), uuid, writeToDb);
 	}
 	
 	public void addBlacklistMember(String groupName, UUID uuid, boolean writeToDb) {
+		/*
 		Set <UUID> ids = blackListsByGroupName.get(groupName);
 		if (ids == null) {
 			loadBlacklistMembersFromDb(groupName);
@@ -66,7 +67,7 @@ public class BlackList {
 			if (writeToDb) {
 				NameLayerPlugin.getGroupManagerDao().addBlackListMember(groupName, uuid);
 			}
-		}
+		}*/
 	}
 	
 	public void removeBlacklistMember(Group group, UUID uuid, boolean writeToDb) {

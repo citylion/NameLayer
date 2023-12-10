@@ -112,6 +112,7 @@ public class GroupManager{
 			@Override
 			public void run() {
 				int id = internalCreateGroup(group, true, name, owner, password);
+				NameLayerPlugin.getGroupManagerDao().trackjoin(owner);
 				NameLayerPlugin.getInstance().getLogger().log(Level.INFO, "Async group create finished for group {0}, id assigned: {1}",
 						new Object[]{name, id});
 				Group g = GroupManager.getGroup(id);
@@ -134,6 +135,7 @@ public class GroupManager{
 			NameLayerPlugin.log(Level.INFO, "Group create was cancelled for group: " + group.getName());
 			return -1;
 		}
+		NameLayerPlugin.getGroupManagerDao().trackjoin(group.getOwner());
 		return internalCreateGroup(group, savetodb, event.getGroupName(), event.getOwner(), event.getPassword());
 	}
 	
@@ -323,6 +325,7 @@ public class GroupManager{
 	 * Saves me code so I can always grab a group if it is already loaded while not needing to check db.
 	 */
 	public static Group getGroup(String name){
+		//Bukkit.getLogger().severe("[NAMELAYER] Get group by name request");
 		if (name == null) {
 			NameLayerPlugin.getInstance().getLogger().log(Level.INFO, "getGroup failed, caller passed in null", new Exception());
 			return null;
@@ -330,9 +333,11 @@ public class GroupManager{
 		
 		String lower = name.toLowerCase();
 		if (groupsByName.containsKey(lower)) {
+			//Bukkit.getLogger().severe("[NAMELAYER] groupsbyname contains key");
 			return groupsByName.get(lower);
 		} else { 
 			Group group = groupManagerDao.getGroup(name);
+			//Bukkit.getLogger().severe("[NAMELAYER] sent dao request");
 			if (group != null) {
 				groupsByName.put(lower, group);
 				for (int j : group.getGroupIds()){

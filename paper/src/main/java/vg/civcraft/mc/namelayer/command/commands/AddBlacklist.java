@@ -22,7 +22,13 @@ public class AddBlacklist extends BaseCommandMiddle {
 	@Description("Blacklist a player for a specific group")
 	@CommandCompletion("@NL_Groups @allplayers")
 	public void execute(Player sender, String groupName, String playerName) {
+
+
 		Player p = (Player) sender;
+		p.sendMessage(ChatColor.RED + "This feature is currently disabled.");
+		return;
+
+		/*
 		Group g = GroupManager.getGroup(groupName);
 		if (g == null) {
 			p.sendMessage(ChatColor.RED + "This group does not exist");
@@ -50,5 +56,7 @@ public class AddBlacklist extends BaseCommandMiddle {
 		}
 		bl.addBlacklistMember(g, targetUUID, true);
 		p.sendMessage(ChatColor.GREEN + NameAPI.getCurrentName(targetUUID) + " was successfully blacklisted on the group " + g.getName());
+		*/
+
 	}
 }

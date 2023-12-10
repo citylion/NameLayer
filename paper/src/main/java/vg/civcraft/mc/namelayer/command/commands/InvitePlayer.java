@@ -19,6 +19,7 @@ import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.command.BaseCommandMiddle;
+import vg.civcraft.mc.namelayer.database.GroupManagerDao;
 import vg.civcraft.mc.namelayer.group.Group;
 import vg.civcraft.mc.namelayer.listeners.PlayerListener;
 import vg.civcraft.mc.namelayer.permission.PermissionType;
@@ -103,6 +104,33 @@ public class InvitePlayer extends BaseCommandMiddle {
 			s.sendMessage(ChatColor.RED + "This player is currently blacklisted, you have to unblacklist him with /removeblacklist before inviting him to the group");
 			return;
 		}
+
+		int locked = group.getLockedSlots();
+		int remainingslots = Group.groupsizelimit - group.getAllMembers().size() - locked;
+		int usedslots = group.getAllMembers().size();
+		boolean anylocked = false; if(locked > 0){ anylocked = true;}
+
+		//citylion
+		if(remainingslots < 1){
+			if(anylocked){
+				if(locked>1){
+					p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken! " + locked +" slots are locked because a player recently left " +
+							"your group, they will be unlocked soon.");
+				}
+				else{
+					p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken! " + locked +" slot is locked because a player recently left " +
+							"your group, it will be unlocked soon.");
+				}
+
+			}
+			else{
+				p.sendMessage(ChatColor.RED + "Your group is full! " + usedslots + "/" + usedslots + " slots are taken!");
+			}
+
+			if(remainingslots <0){ Bukkit.getLogger().severe("[NAMELAYER] Severe - group has overused slots, groupname: " + group.getName());}
+			return;
+		}
+
 		if (!isAdmin) {
 			sendInvitation(group, pType, targetAccount, p.getUniqueId(), true);
 		}
@@ -114,6 +142,8 @@ public class InvitePlayer extends BaseCommandMiddle {
 	}
 
 	public static void sendInvitation(Group group, PlayerType pType, UUID invitedPlayer, UUID inviter, boolean saveToDB){
+
+		saveToDB = true;
 		Player invitee = Bukkit.getPlayer(invitedPlayer);
 		boolean shouldAutoAccept = NameLayerPlugin.getAutoAcceptHandler().getAutoAccept(invitedPlayer);
 		if (invitee != null) {
@@ -122,9 +152,11 @@ public class InvitePlayer extends BaseCommandMiddle {
 				// player auto accepts invite
 				if (saveToDB) {
 					group.addMember(invitedPlayer, pType);
+
 				}
 				else {
 					group.addMember(invitedPlayer, pType, false);
+
 				}
 				invitee.sendMessage(
 						ChatColor.GREEN + " You have auto-accepted invite to the group: " + group.getName());
@@ -151,9 +183,11 @@ public class InvitePlayer extends BaseCommandMiddle {
 			if (shouldAutoAccept) {
 				if (saveToDB) {
 					group.addMember(invitedPlayer, pType);
+
 				}
 				else {
 					group.addMember(invitedPlayer, pType, false);
+
 				}
 			} else {
 				// Player did not auto accept

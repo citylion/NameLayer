@@ -148,11 +148,12 @@ public class MainGroupGUI extends AbstractGroupGUI {
 			}
 		}, 49);
 
+
 		// options at the top
 		ci.setSlot(getInvitePlayerClickable(), 0);
-		ci.setSlot(createBlacklistToggle(), 1);
-		ci.setSlot(getAddBlackListClickable(), 2);
-		ci.setSlot(getLeaveGroupClickable(), 3);
+		//ci.setSlot(createBlacklistToggle(), 1); //citylion
+		//ci.setSlot(getAddBlackListClickable(), 2);
+		ci.setSlot(getLeaveGroupClickable(), 2);//changed to 2 from 3
 		ci.setSlot(getInfoStack(), 4);
 		ci.setSlot(getDefaultGroupStack(), 5);
 		ci.setSlot(getPasswordClickable(), 6);
@@ -576,6 +577,7 @@ public class MainGroupGUI extends AbstractGroupGUI {
 					p.getName() + " kicked " + NameAPI.getCurrentName(toRemove)
 							+ " from " + g.getName() + " via the gui");
 			g.removeMember(toRemove);
+
 			p.sendMessage(ChatColor.GREEN + NameAPI.getCurrentName(toRemove)
 					+ " has been removed from the group");
 		} else {
@@ -625,6 +627,7 @@ public class MainGroupGUI extends AbstractGroupGUI {
 				// player is offline change their perms
 				g.removeMember(toChange);
 				g.addMember(toChange, newRank);
+
 			}
 			p.sendMessage(ChatColor.GREEN
 					+ NameAPI.getCurrentName(toChange)
@@ -1041,6 +1044,7 @@ public class MainGroupGUI extends AbstractGroupGUI {
 							NameLayerPlugin.log(Level.INFO, p.getName()
 									+ " left " + g.getName() + " via the gui");
 							g.removeMember(p.getUniqueId());
+
 							p.sendMessage(ChatColor.GREEN + "You have left "
 									+ g.getName());
 						}

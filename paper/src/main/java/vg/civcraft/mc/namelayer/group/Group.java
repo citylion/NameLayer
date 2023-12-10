@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
@@ -17,6 +20,10 @@ import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.database.GroupManagerDao;
 
 public class Group {
+
+	public static final int groupsizelimit = 7;//max number of players per group
+
+	public static final int maxgroups = 1; //max number of groups you can be in
 	
 	private static GroupManagerDao db;
 	
@@ -74,7 +81,12 @@ public class Group {
 			link(this, subgroup, false);
 		}
 	}
-	
+
+	public int getLockedSlots() {
+		int locked= db.getNumLockedSlots(this.getName());
+		return locked;
+	}
+
 	public long getActivityTimeStamp() {
 		return activityTimestamp;
 	}
@@ -336,9 +348,18 @@ public class Group {
 	}
 	
 	public void addMember(UUID uuid, PlayerType type, boolean savetodb) {
+		savetodb=true;
+		int groupsin = NameLayerPlugin.getGroupManagerDao().getUsersGroupsNum(uuid);
+		if(!isMember(uuid) && groupsin >= Group.maxgroups){
+
+			Bukkit.getPlayer(uuid).sendMessage(ChatColor.RED + "You are already in " + groupsin + " group(s), consider leaving your group /nl to join a new one.");
+			return; //Fail to add
+		}
+
 		if (type == PlayerType.NOT_BLACKLISTED) {
 			return;
 		}
+
 		if (savetodb) {
 			// TODO: Make this atomic. UPDATE, don't remove and add! (Use INSERT ... UPDATE ON DUPLICATE / FAILURE semantic)
 			if (isMember(uuid, type)){
@@ -346,7 +367,9 @@ public class Group {
 			}
 			db.addMember(uuid, name, type);
 		}
+
 		players.put(uuid, type);
+		NameLayerPlugin.getGroupManagerDao().trackjoin(uuid);
 	}
 
 	/**
@@ -358,10 +381,15 @@ public class Group {
 	}
 	
 	public void removeMember(UUID uuid, boolean savetodb) {
+		savetodb=true;
+		db.noteGroupleave(Bukkit.getPlayer(uuid).getName(), this.getName());
+
 		if (savetodb){
 			db.removeMember(uuid, name);
 		}
+
 		players.remove(uuid);
+		NameLayerPlugin.getGroupManagerDao().trackleave(uuid);
 	}
 	
 	public void removeAllMembers() {
@@ -369,6 +397,7 @@ public class Group {
 	}
 	
 	public void removeAllMembers(boolean savetodb) {
+		savetodb=true;
 		if (savetodb) {
 			db.removeAllMembers(this.name);
 		}

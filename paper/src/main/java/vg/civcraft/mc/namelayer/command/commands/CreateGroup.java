@@ -32,6 +32,11 @@ public class CreateGroup extends BaseCommandMiddle {
 			p.sendMessage(ChatColor.RED + "You cannot create any more groups! Please delete an un-needed group before making more.");
 			return;
 		}
+
+		if (NameLayerPlugin.getGroupManagerDao().getUsersGroupsNum(sender.getUniqueId()) >= Group.maxgroups){
+			p.sendMessage(ChatColor.RED + "You cannot create any more groups! Please delete an un-needed group before making more.");
+			return;
+		}
 		
 		//enforce regulations on the name
 		if (name.length() > 32) {

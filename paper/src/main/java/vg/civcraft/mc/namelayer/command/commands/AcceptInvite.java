@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.commands.TabComplete;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
+import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.command.BaseCommandMiddle;
 import vg.civcraft.mc.namelayer.command.TabCompleters.InviteTabCompleter;
 import vg.civcraft.mc.namelayer.group.Group;
@@ -46,6 +47,7 @@ public class AcceptInvite extends BaseCommandMiddle {
 			return;
 		}
 		group.addMember(uuid, type);
+
 		group.removeInvite(uuid, true);
 		PlayerListener.removeNotification(uuid, group);
 		p.sendMessage(Component.text("You have successfully been added to the group as a " + type.name() +".").color(NamedTextColor.GREEN));
