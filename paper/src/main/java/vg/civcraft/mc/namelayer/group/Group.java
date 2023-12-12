@@ -21,7 +21,7 @@ import vg.civcraft.mc.namelayer.database.GroupManagerDao;
 
 public class Group {
 
-	public static final int groupsizelimit = 7;//max number of players per group
+	public static final int groupsizelimit = 3;//max number of players per group
 
 	public static final int maxgroups = 1; //max number of groups you can be in
 	
