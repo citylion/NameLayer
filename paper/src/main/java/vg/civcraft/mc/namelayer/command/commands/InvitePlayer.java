@@ -159,7 +159,7 @@ public class InvitePlayer extends BaseCommandMiddle {
 
 				}
 				invitee.sendMessage(
-						ChatColor.GREEN + " You have auto-accepted invite to the group: " + group.getName());
+							ChatColor.YELLOW + " You have tried to auto-accept an invite to the group: " + group.getName());
 			} else {
 				group.addInvite(invitedPlayer, pType, saveToDB);
 				PlayerListener.addNotification(invitedPlayer, group);
@@ -173,7 +173,7 @@ public class InvitePlayer extends BaseCommandMiddle {
 				}
 				TextComponent message = new TextComponent(msg + "Click this message to accept. If you wish to toggle invites "
 						+ "so they always are accepted please run /autoaccept");
-				message.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+				message.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
 				message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nlag " + group.getName()));
 				message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("  ---  Click to accept").create()));
 				invitee.spigot().sendMessage(message);

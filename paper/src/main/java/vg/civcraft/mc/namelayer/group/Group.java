@@ -21,7 +21,7 @@ import vg.civcraft.mc.namelayer.database.GroupManagerDao;
 
 public class Group {
 
-	public static final int groupsizelimit = 3;//max number of players per group
+	public static final int groupsizelimit = 12;//max number of players per group
 
 	public static final int maxgroups = 1; //max number of groups you can be in
 	
@@ -248,6 +248,9 @@ public class Group {
 	 * @param saveToDB - save the invitation to the DB. 
 	 */
 	public void addInvite(UUID uuid, PlayerType type, boolean saveToDB){
+
+
+
 		invites.put(uuid, type);
 		if(saveToDB){
 			db.addGroupInvitation(uuid, name, type.name());
