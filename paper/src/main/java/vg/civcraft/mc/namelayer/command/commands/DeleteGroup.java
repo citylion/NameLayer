@@ -49,12 +49,13 @@ public class DeleteGroup extends BaseCommandMiddle {
 				if(now.getTime() < Long.parseLong(entry[1]))
 				{
 
+					/* //I moved this to the groupmanager class, to cover all deletion cases..
 					//Bukkit.getLogger().severe("[NAMELAYER] PARSING ALL MEMBERS FOR DELETION");
 					List<UUID> members = gD.getAllMembers();
 					for (UUID uid : members) {
 						NameLayerPlugin.getGroupManagerDao().trackleave(uid);
 					}
-
+					*/
 					//good to go delete the group
 					if(gm.deleteGroup(gD.getName()))
 						p.sendMessage(ChatColor.GREEN + "Group was successfully deleted.");

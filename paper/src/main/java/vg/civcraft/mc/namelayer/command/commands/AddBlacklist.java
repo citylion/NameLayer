@@ -25,7 +25,7 @@ public class AddBlacklist extends BaseCommandMiddle {
 
 
 		Player p = (Player) sender;
-		p.sendMessage(ChatColor.RED + "This feature is currently disabled.");
+		p.sendMessage(ChatColor.RED + "This feature is disabled.");
 		return;
 
 		/*

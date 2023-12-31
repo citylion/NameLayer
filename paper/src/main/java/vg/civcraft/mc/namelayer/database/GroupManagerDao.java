@@ -39,11 +39,13 @@ public class GroupManagerDao {
 
 	private static final String playerGroupNumTrackerRETRIVE = "SELECT `amount` FROM `playertracker` WHERE uuid = ?";
 	private static final String playerGroupNumTrackerREMOVE = "UPDATE `playertracker` SET amount=amount-1 WHERE uuid = ?;";
+
+	private static final String playerGroupNumTrackerFORCE = "UPDATE `playertracker` SET amount=? WHERE uuid = ?;";
 	private static final String playerGroupNumTrackerADD = "INSERT INTO `playertracker` (uuid,amount) values(?, 1) ON DUPLICATE KEY UPDATE amount = amount+1";
 
 	private static final String getAllGroupLeaves = "SELECT `timestamp` FROM `sizelimitlog` WHERE `groupname` = ?";
 
-	private static final String appendleavetimestamp = "insert into sizelimitlog(username, groupname, timestamp) values(?, ?, ?)";
+	private static final String appendleavetimestamp = "insert into sizelimitlog(username, groupname, timestamp) values(?, ?, ?)";//size limit log just keeps tracks of when players left a group recently
 
 	private static final String removeCycles = "delete a from subgroup a join faction_id a2 ON a.group_id = a2.group_id "
 				+ "JOIN subgroup b JOIN faction_id b2 on b.sub_group_id = b2.group_id where a2.group_name = b2.group_name;";
@@ -1419,7 +1421,7 @@ public class GroupManagerDao {
 	}
 
 	//citylion
-	public void noteGroupleave(String username, String groupName){
+	public void noteGroupleave(String username, String groupName){//tracks when a groups slot gets locked
 		try (Connection connection = db.getConnection();
 			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.appendleavetimestamp);){
 			noteRemoval.setString(1, username);
@@ -1462,21 +1464,32 @@ public class GroupManagerDao {
 	//citylion
 	public void trackjoin(final UUID uuid){
 		try (Connection connection = db.getConnection();
-			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerADD);){
-			noteRemoval.setString(1, String.valueOf(uuid));
-			noteRemoval.executeUpdate();
+			 PreparedStatement tckJoin = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerADD);){
+			tckJoin.setString(1, String.valueOf(uuid));
+			tckJoin.executeUpdate();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem tracking join " + uuid, e);
 		}
 	}
 
-	public void trackleave(final UUID uuid){
+	public void trackleave(final UUID uuid){//tracks when a player is allowed to join another group
 		try (Connection connection = db.getConnection();
-			 PreparedStatement noteRemoval = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerREMOVE);){
-			noteRemoval.setString(1, String.valueOf(uuid));
-			noteRemoval.executeUpdate();
+			 PreparedStatement tckLeave = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerREMOVE);){
+			tckLeave.setString(1, String.valueOf(uuid));
+			tckLeave.executeUpdate();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem tracking leave " + uuid, e);
+		}
+	}
+
+	public void trackforce(final UUID uuid, int num){
+		try (Connection connection = db.getConnection();
+			 PreparedStatement tckLeave = connection.prepareStatement(GroupManagerDao.playerGroupNumTrackerFORCE);){
+			tckLeave.setInt(1, num);
+			tckLeave.setString(2, String.valueOf(uuid));
+			tckLeave.executeUpdate();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem force tracking " + uuid, e);
 		}
 	}
 

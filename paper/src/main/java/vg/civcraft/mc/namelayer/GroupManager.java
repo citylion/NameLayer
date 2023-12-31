@@ -158,6 +158,15 @@ public class GroupManager{
 	}
 	
 	public boolean deleteGroup(String groupName, boolean savetodb){
+		savetodb=true;
+
+		List<UUID> members = GroupManager.getGroup(groupName).getAllMembers();
+		for (UUID uid : members) {
+			NameLayerPlugin.getGroupManagerDao().trackleave(uid);
+			Bukkit.getLogger().info("[NameLayer] Tracking group leave on deletion for player " + Bukkit.getPlayer(uid).getName() + "from group " + groupName);
+		}
+
+
 		if (groupName == null) {
 			NameLayerPlugin.getInstance().getLogger().log(Level.INFO, "Group delete failed, caller passed in null", new Exception());
 			return false;

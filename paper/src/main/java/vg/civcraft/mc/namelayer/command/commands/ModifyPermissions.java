@@ -23,6 +23,12 @@ public class ModifyPermissions extends BaseCommandMiddle {
 	@Description("Modify the permissions of a group.")
 	@CommandCompletion("@NL_Groups add|remove @NL_Ranks @NL_Perms")
 	public void execute(CommandSender sender, String groupName, String adding, String playerRank, String permissionName) {
+		sender.sendMessage(ChatColor.RED + "Please use the GUI instead /nl");
+		return;
+	}
+		/*
+
+
 		if (!(sender instanceof Player)){
 			sender.sendMessage(ChatColor.RED + "You must be a player. Nuf said.");
 			return;
@@ -98,4 +104,6 @@ public class ModifyPermissions extends BaseCommandMiddle {
 			p.sendMessage(ChatColor.RED + "Specify if you want to add or remove.");
 		}
 	}
+
+		 */
 }

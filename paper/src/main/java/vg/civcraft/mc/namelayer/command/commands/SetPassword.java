@@ -21,6 +21,12 @@ public class SetPassword extends BaseCommandMiddle {
 	@Description("Set a password on a group.")
 	@CommandCompletion("@NL_Groups")
 	public void execute(CommandSender sender, String groupName, String userPassword) {
+		sender.sendMessage("This feature is disabled.");
+		return;
+	}
+		/*
+
+
 		if (!(sender instanceof Player)){
 			sender.sendMessage("You may not use this command, must be a pluer.");
 			return;
@@ -49,4 +55,8 @@ public class SetPassword extends BaseCommandMiddle {
 		g.setPassword(password);
 		p.sendMessage(ChatColor.GREEN + "Password has been successfully set to: " + g.getPassword());
 	}
+
+		 */
+
+
 }

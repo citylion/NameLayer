@@ -40,12 +40,12 @@ public class PermissionManageGUI extends AbstractGroupGUI {
 			return;
 		}
 		//dye blacklisted clickable black
-		Clickable blackClick = produceSelectionClickable(Material.LEATHER_CHESTPLATE, PlayerType.NOT_BLACKLISTED);
-		ItemStack blackStack = blackClick.getItemStack();
-		LeatherArmorMeta meta = (LeatherArmorMeta)blackStack.getItemMeta();
-		meta.setColor(Color.BLACK);
-		blackStack.setItemMeta(meta);
-		ci.setSlot(blackClick, 9);
+		//Clickable blackClick = produceSelectionClickable(Material.LEATHER_CHESTPLATE, PlayerType.NOT_BLACKLISTED);
+		//ItemStack blackStack = blackClick.getItemStack();
+		//LeatherArmorMeta meta = (LeatherArmorMeta)blackStack.getItemMeta();
+		//meta.setColor(Color.BLACK);
+		//blackStack.setItemMeta(meta);
+		//ci.setSlot(blackClick, 9);
 		ci.setSlot(
 				produceSelectionClickable(Material.LEATHER_CHESTPLATE,
 						PlayerType.MEMBERS), 11);

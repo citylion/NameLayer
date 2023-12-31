@@ -3,16 +3,13 @@ package vg.civcraft.mc.namelayer.group;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
@@ -352,10 +349,22 @@ public class Group {
 	
 	public void addMember(UUID uuid, PlayerType type, boolean savetodb) {
 		savetodb=true;
-		int groupsin = NameLayerPlugin.getGroupManagerDao().getUsersGroupsNum(uuid);
+
+		int locked = this.getLockedSlots();
+		int remainingslots = Group.groupsizelimit - this.getAllMembers().size() - locked;
+		int usedslots = this.getAllMembers().size();
+		boolean anylocked = false; if(locked > 0){ anylocked = true;}
+
+		if(remainingslots<1){
+			Objects.requireNonNull(Bukkit.getPlayer(uuid)).sendMessage(ChatColor.RED + "Group " + this.name + " is full! " + usedslots + " taken " + ", " + locked + " slots being added to this group tomorrow.");
+			Bukkit.getLogger().warning("[NameLayer] Preventing join at addMember in Group class, since group is already full. " + this.name + " " + Bukkit.getPlayer(uuid).getName());
+			return;
+		}
+
+		int groupsin = NameLayerPlugin.getGroupManagerDao().getUsersGroupsNum(uuid);//get number of groups that the user is in
 		if(!isMember(uuid) && groupsin >= Group.maxgroups){
 
-			Bukkit.getPlayer(uuid).sendMessage(ChatColor.RED + "You are already in " + groupsin + " group(s), consider leaving your group /nl to join a new one.");
+			Objects.requireNonNull(Bukkit.getPlayer(uuid)).sendMessage(ChatColor.RED + "You are already in " + groupsin + " group(s), consider leaving your group /nl to join a new one.");
 			return; //Fail to add
 		}
 
@@ -382,17 +391,36 @@ public class Group {
 	public void removeMember(UUID uuid){
 		removeMember(uuid,true);
 	}
-	
+
 	public void removeMember(UUID uuid, boolean savetodb) {
+		removeMember(uuid,savetodb,false);
+	}
+
+	public void removeMember(UUID uuid, boolean savetodb, boolean promotion) {
 		savetodb=true;
-		db.noteGroupleave(Bukkit.getPlayer(uuid).getName(), this.getName());
+		String name = "";
+		Player player = Bukkit.getPlayer(uuid);
+		if(player == null){
+			Bukkit.getLogger().severe("Null player, maybe they are offline?");
+			name = Bukkit.getOfflinePlayer(uuid).getName();
+		}
+		else{
+			name = player.getName();
+		}
+
+		if(!promotion){
+			db.noteGroupleave(name, this.getName());//noteleave tracks locking slots for the group
+		}
+
+
 
 		if (savetodb){
 			db.removeMember(uuid, name);
 		}
 
 		players.remove(uuid);
-		NameLayerPlugin.getGroupManagerDao().trackleave(uuid);
+		Bukkit.getLogger().info("[NameLayer] Tracking leave for " + name + " from " + this.name);
+		NameLayerPlugin.getGroupManagerDao().trackleave(uuid);//trackingleave is used for tracking how many groups a player is in.
 	}
 	
 	public void removeAllMembers() {

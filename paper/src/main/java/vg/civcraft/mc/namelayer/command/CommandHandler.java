@@ -54,6 +54,9 @@ public class CommandHandler extends CommandManager{
 		registerCommand(new RemoveBlacklist());
 		registerCommand(new ShowBlacklist());
 		registerCommand(new NameLayerGroupGui());
+
+		//citylioon
+		registerCommand(new AdminOverrideTracker());
 	}
 
 	@Override

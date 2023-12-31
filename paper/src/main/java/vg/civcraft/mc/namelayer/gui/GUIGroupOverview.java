@@ -230,6 +230,12 @@ public class GUIGroupOverview {
 
 			@Override
 			public void clicked(final Player p) {
+
+				if (NameLayerPlugin.getGroupManagerDao().getUsersGroupsNum(p.getUniqueId()) >= Group.maxgroups){
+					p.sendMessage(ChatColor.RED + "You cannot create any more groups! Please delete an un-needed group before making more.");
+					return;
+				}
+
 				p.sendMessage(ChatColor.YELLOW
 						+ "Enter the name of your new group or \"cancel\" to exit this prompt");
 				ClickableInventory.forceCloseInventory(p);

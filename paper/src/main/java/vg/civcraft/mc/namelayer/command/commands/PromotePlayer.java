@@ -131,7 +131,7 @@ public class PromotePlayer extends BaseCommandMiddle {
 			if(event.isCancelled()){
 				return;
 			}
-			group.removeMember(promotee);
+			group.removeMember(promotee, true, true);
 			group.addMember(promotee, promoteeType);
 			p.sendMessage(ChatColor.GREEN + NameAPI.getCurrentName(promotee) + " has been added as (PlayerType) " +
 					promoteeType.toString() + " in (Group) " + group.getName());
@@ -140,7 +140,7 @@ public class PromotePlayer extends BaseCommandMiddle {
 		}
 		else{
 			//player is offline change their perms
-			group.removeMember(promotee);
+			group.removeMember(promotee, true, true);
 			group.addMember(promotee, promoteeType);
 			p.sendMessage(ChatColor.GREEN + NameAPI.getCurrentName(promotee) + " has been added as (PlayerType) " +
 					promoteeType.toString() + " in (Group) " + group.getName());

@@ -20,6 +20,11 @@ public class JoinGroup extends BaseCommandMiddle {
 	@Syntax("<group> [password]")
 	@Description("Join a password protected group.")
 	public void execute(Player sender, String groupName, String attemptedPassword) {
+		sender.sendMessage("Join this group by accepting an invite.");
+		return;
+	}
+	/*
+
 		Player p = (Player) sender;
 		Group g = gm.getGroup(groupName);
 		if (groupIsNull(sender, groupName, g)) {
@@ -57,4 +62,6 @@ public class JoinGroup extends BaseCommandMiddle {
 
 		p.sendMessage(ChatColor.GREEN + "You have successfully been added to this group.");
 	}
+
+	 */
 }

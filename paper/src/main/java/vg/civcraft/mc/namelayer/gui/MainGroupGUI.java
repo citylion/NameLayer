@@ -156,7 +156,7 @@ public class MainGroupGUI extends AbstractGroupGUI {
 		ci.setSlot(getLeaveGroupClickable(), 2);//changed to 2 from 3
 		ci.setSlot(getInfoStack(), 4);
 		ci.setSlot(getDefaultGroupStack(), 5);
-		ci.setSlot(getPasswordClickable(), 6);
+		//ci.setSlot(getPasswordClickable(), 6);
 		ci.setSlot(getPermOptionClickable(), 7);
 		ci.setSlot(getAdminStuffClickable(), 8);
 		ci.showInventory(p);
@@ -618,14 +618,14 @@ public class MainGroupGUI extends AbstractGroupGUI {
 							+ "Could not change player rank, you should complain about this");
 					return;
 				}
-				g.removeMember(toChange);
+				g.removeMember(toChange, true, true);
 				g.addMember(toChange, newRank);
 				oProm.sendMessage(ChatColor.GREEN
 						+ "You have been promoted to " + getRankName(toChange)
 						+ " in (Group) " + g.getName());
 			} else {
 				// player is offline change their perms
-				g.removeMember(toChange);
+				g.removeMember(toChange,true, true);
 				g.addMember(toChange, newRank);
 
 			}
