@@ -3,8 +3,16 @@ pluginManagement {
 		gradlePluginPortal()
 		maven("https://repo.civmc.net/repository/maven-public/")
 		maven("https://papermc.io/repo/repository/maven-public/")
+		maven {
+			name = "reposiliteRepositoryReleases"
+			url = uri("http://localhost:8080/releases")
+			isAllowInsecureProtocol=true
+		}
+
+
 	}
 }
+
 
 rootProject.name = "namelayer"
 

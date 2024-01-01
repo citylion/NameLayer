@@ -398,28 +398,28 @@ public class Group {
 
 	public void removeMember(UUID uuid, boolean savetodb, boolean promotion) {
 		savetodb=true;
-		String name = "";
+		String playeruid = "";
 		Player player = Bukkit.getPlayer(uuid);
 		if(player == null){
 			Bukkit.getLogger().severe("Null player, maybe they are offline?");
-			name = Bukkit.getOfflinePlayer(uuid).getName();
+			playeruid = Bukkit.getOfflinePlayer(uuid).getName();
 		}
 		else{
-			name = player.getName();
+			playeruid = player.getName();
 		}
 
 		if(!promotion){
-			db.noteGroupleave(name, this.getName());//noteleave tracks locking slots for the group
+			db.noteGroupleave(playeruid, this.getName());//noteleave tracks locking slots for the group
 		}
 
 
 
 		if (savetodb){
-			db.removeMember(uuid, name);
+			db.removeMember(uuid, this.name);
 		}
 
 		players.remove(uuid);
-		Bukkit.getLogger().info("[NameLayer] Tracking leave for " + name + " from " + this.name);
+		Bukkit.getLogger().info("[NameLayer] Tracking leave for " + playeruid + " from " + this.name);
 		NameLayerPlugin.getGroupManagerDao().trackleave(uuid);//trackingleave is used for tracking how many groups a player is in.
 	}
 	

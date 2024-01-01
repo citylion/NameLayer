@@ -163,7 +163,7 @@ public class GroupManager{
 		List<UUID> members = GroupManager.getGroup(groupName).getAllMembers();
 		for (UUID uid : members) {
 			NameLayerPlugin.getGroupManagerDao().trackleave(uid);
-			Bukkit.getLogger().info("[NameLayer] Tracking group leave on deletion for player " + Bukkit.getPlayer(uid).getName() + "from group " + groupName);
+			Bukkit.getLogger().info("[NameLayer] Tracking group leave on deletion for player " + uid + "from group " + groupName);
 		}
 
 

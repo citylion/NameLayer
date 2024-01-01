@@ -780,6 +780,7 @@ public class GroupManagerDao {
 	public void removeMemberAsync(final UUID member, final String group){
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
 
+
 			@Override
 			public void run() {
 				removeMember(member,group);
@@ -789,11 +790,15 @@ public class GroupManagerDao {
 	}
 	
 	public void removeMember(UUID member, String group){
+
+		Bukkit.getLogger().info("[NAMELAYER-DAO] Instructions to remove uuid " + member + " from group " + group);
+
 		try (Connection connection = db.getConnection();
 				PreparedStatement removeMember = connection.prepareStatement(GroupManagerDao.removeMember)){
 			removeMember.setString(1, member.toString());
 			removeMember.setString(2, group);
 			removeMember.executeUpdate();
+			Bukkit.getLogger().info(removeMember.toString());
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem removing " + member + " from group " + group, e);
 		}
@@ -1447,6 +1452,7 @@ public class GroupManagerDao {
 					Timestamp timestamp = set.getTimestamp(1);
 					if (timestamp != null) {
 						long timediff = System.currentTimeMillis() - timestamp.getTime();
+						Bukkit.getLogger().info("[Namelayer] Time difference is " + timediff);
 						if (timediff < 86400000 && timediff > 0) {
 							lockedslots++;
 						}
@@ -1457,7 +1463,8 @@ public class GroupManagerDao {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem getting num locked slots", e);
 		}
-		//logger.log(Level.FINE, "Locked slots num is " + lockedslots + " for " + groupName);
+		logger.log(Level.FINE, "Locked slots num is " + lockedslots + " for " + groupName);
+		Bukkit.getLogger().info("Locked slots num is " + lockedslots + " for " + groupName);
 		return lockedslots;
 	}
 

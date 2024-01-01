@@ -14,6 +14,9 @@ subprojects {
 	}
 
 	repositories {
+
+
+
 		mavenCentral()
 		maven("https://repo.civmc.net/repository/maven-public")
 		maven("https://jitpack.io")
